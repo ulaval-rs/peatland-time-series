@@ -1,0 +1,14 @@
+*
+
+!.gitignore
+!README.md
+!requirements.txt
+
+!bourgault/
+!bourgault/**
+
+!tests/
+!tests/**
+
+*.pyc
+*.pyo
