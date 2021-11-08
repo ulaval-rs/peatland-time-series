@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "peatland_time_series"
+version = "0.1.0"
+description = ""
+authors = ["Gabriel Couture <gacou54@ulaval.ca>"]
+license = "BSD-3-Clause"
+
+[tool.poetry.dependencies]
+python = ">=3.7.1,<3.11"
+pandas = "^1.3.4"
+numpy = "^1.21.4"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

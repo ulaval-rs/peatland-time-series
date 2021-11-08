@@ -2,10 +2,11 @@
 
 !.gitignore
 !README.md
-!requirements.txt
+!poetry.lock
+!pyproject.toml
 
-!bourgault/
-!bourgault/**
+!peatland_time_series/
+!peatland_time_series/**
 
 !tests/
 !tests/**

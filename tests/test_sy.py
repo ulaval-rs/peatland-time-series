@@ -2,7 +2,7 @@ import numpy
 import pandas
 import pytest
 
-from bourgault.sy import calculate_sy
+from peatland_time_series.sy import calculate_sy
 
 TIME_SERIES_PATH = './tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_naturnah_sp.csv'
 EXPECTED_RESULT_PATH = './tests/data/expected_results.csv'
