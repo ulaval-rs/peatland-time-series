@@ -24,21 +24,23 @@ date,data_prec,data_wtd
 2011-06-16 16:00:00,-0.084,0
 ```
 
-To calculate the Sy with other pertinents information:
+To calculate the Sy with other pertinent information:
 ```python
 import pandas
 from peatland_time_series import calculate_sy
 
-data = pandas.read_csv()
+time_series = pandas.read_csv('./data/time-series.csv')
 
-result = calculate_sy()
-print(results)
+result = calculate_sy(time_series)
+print(results.head())
 ```
 Output:
 ```
-,date_beginning,date_ending,precision_sum,max_wtd,min_wtd,durations,intensities,delta_h,depth,sy,idx_max,idx_min,accuracy_mean,accuracy_std
-0,2011-06-16 14:00:00,2011-06-16 14:00:00,10.3,-0.084,-0.109,0.5,20.6,0.025,-0.0965,0.412,2011-06-16 16:00:00,2011-06-16 14:00:00,0.0013,0.00332
-1,2011-06-16 20:00:00,2011-06-16 21:00:00,3.7,-0.072,-0.1,1.0,3.7,0.028,-0.086,0.132,2011-06-16 23:00:00,2011-06-16 20:00:00,0.0,0.0
-2,2011-06-18 04:00:00,2011-06-18 05:00:00,1.2,-0.067,-0.084,1.0,1.2,0.017,-0.076,0.07058823529411763,2011-06-18 04:00:00,2011-06-18 09:00:00,0.0,0.0
+       date_beginning         date_ending  precision_sum  max_wtd  min_wtd  durations  intensities  delta_h   depth        sy             idx_max             idx_min  accuracy_mean  accuracy_std
+0 2011-06-16 14:00:00 2011-06-16 14:00:00           10.3   -0.084   -0.109        0.5         20.6    0.025 -0.0965  0.412000 2011-06-16 16:00:00 2011-06-16 14:00:00       0.001333      0.003317
+1 2011-06-16 20:00:00 2011-06-16 21:00:00            3.7   -0.072   -0.100        1.0          3.7    0.028 -0.0860  0.132143 2011-06-16 23:00:00 2011-06-16 20:00:00       0.000000      0.000000
+2 2011-06-18 04:00:00 2011-06-18 05:00:00            1.2   -0.067   -0.084        1.0          1.2    0.017 -0.0755  0.070588 2011-06-18 04:00:00 2011-06-18 09:00:00       0.000000      0.000000
+3 2011-06-18 12:00:00 2011-06-18 12:00:00            0.4   -0.085   -0.094        0.5          0.8    0.009 -0.0895  0.044444 2011-06-18 12:00:00 2011-06-18 15:00:00       0.001556      0.002603
+4 2011-06-18 17:00:00 2011-06-18 17:00:00            1.6   -0.077   -0.087        0.5          3.2    0.010 -0.0820  0.160000 2011-06-18 18:00:00 2011-06-18 17:00:00       0.000667      0.001000
 ```
 

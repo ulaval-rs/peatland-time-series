@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def calculate_sy(
-        data: pd.DataFrame,
+        time_series: pd.DataFrame,
         gap: int = 5,
         max_hour: int = 5,
         threshold: float = 0.3,
@@ -15,7 +15,7 @@ def calculate_sy(
 
     Parameters
     ----------
-    data : pandas.Dataframe
+    time_series : pandas.Dataframe
         DataFrame of time series with at least the 3 following columns: 'date', 'data_wtd' and 'data_prec'.
         'date' refers to the date of the data acquisition ("YYYY-MM-DD hh:mm:ss", ex. "2011-06-15 15:00:00").
         'data_wtd' refers to the water table depth to the surface.
@@ -37,9 +37,9 @@ def calculate_sy(
         Profile of effectives porosity.
     """
     ####### DEFINE_DATA ########
-    time = data['date'].astype('datetime64[ns]')
-    water_table_depth = data['data_wtd']
-    precision = data['data_prec']
+    time = time_series['date'].astype('datetime64[ns]')
+    water_table_depth = time_series['data_wtd']
+    precision = time_series['data_prec']
 
     ####### TRANSFORM_IN_PANDAS_DATAFRAME #######
     df_water_table_depth = pd.DataFrame(water_table_depth)
