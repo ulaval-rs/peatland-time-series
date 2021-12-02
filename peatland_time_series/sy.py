@@ -11,7 +11,7 @@ def calculate_sy(
         max_hour: int = 5,
         threshold: float = 0.3,
         resample: Union[pandas.DateOffset, pandas.Timedelta, str] = 'H') -> pd.DataFrame:
-    """Calculate Sy, the profile of effectives porosity.
+    """Calculate the Specific Yield (Sy) from .
 
     Parameters
     ----------
