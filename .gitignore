@@ -5,6 +5,9 @@
 !poetry.lock
 !pyproject.toml
 
+!.github/
+!.github/**
+
 !peatland_time_series/
 !peatland_time_series/**
 
