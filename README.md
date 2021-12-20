@@ -44,3 +44,7 @@ Output:
 4 2011-06-18 17:00:00 2011-06-18 17:00:00            1.6   -0.077   -0.087        0.5          3.2    0.010 -0.0820  0.160000 2011-06-18 18:00:00 2011-06-18 17:00:00       0.000667      0.001000
 ```
 
+## Reference / Citation
+We kindly ask users who produce scientific works to cite the following paper when using this library or algorithms :
+Quantification of peatland water storage capacity using the water table fluctuation method (https://doi.org/10.1002/hyp.11116)
+
