@@ -13,7 +13,7 @@ def sy():
     return pandas.read_csv(SY_PATH)
 
 
-@pytest.mark.parametrize('filters, tolerate_intervals', [
+@pytest.mark.parametrize('filters, tolerances', [
     ({
          'precipitation_sum_min': 2.0,
          'precipitation_sum_max': 7.0
@@ -27,10 +27,10 @@ def sy():
          'sy': (0.2, 0.25)
      }),
 ])
-def test_filter(sy: pandas.DataFrame, filters: Dict, tolerate_intervals: Dict):
+def test_filter(sy: pandas.DataFrame, filters: Dict, tolerances: Dict):
     result = filter_sy(sy, **filters)
 
-    for key, value in tolerate_intervals.items():
+    for key, value in tolerances.items():
         min_tolerance, max_tolerance = value
 
         valid_check = (result[key] > min_tolerance) & (result[key] < max_tolerance)
@@ -38,7 +38,7 @@ def test_filter(sy: pandas.DataFrame, filters: Dict, tolerate_intervals: Dict):
         assert valid_check.all(), f"Some of the \"{key}\" values were not in the tolerances [{min_tolerance}, {max_tolerance}]."
 
 
-@pytest.mark.parametrize('filters, tolerate_intervals', [
+@pytest.mark.parametrize('filters, tolerances', [
     ({
          'precipitation_sum_min': 2.0,
          'precipitation_sum_max': 7.0
@@ -52,10 +52,10 @@ def test_filter(sy: pandas.DataFrame, filters: Dict, tolerate_intervals: Dict):
          'sy': (0.2, 0.21)
      }),
 ])
-def test_filter_with_expected_wrong_tolerances(sy: pandas.DataFrame, filters: Dict, tolerate_intervals: Dict):
+def test_filter_with_expected_wrong_tolerances(sy: pandas.DataFrame, filters: Dict, tolerances: Dict):
     result = filter_sy(sy, **filters)
 
-    for key, value in tolerate_intervals.items():
+    for key, value in tolerances.items():
         min_tolerance, max_tolerance = value
 
         valid_check = (result[key] > min_tolerance) & (result[key] < max_tolerance)
