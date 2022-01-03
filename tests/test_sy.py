@@ -5,8 +5,8 @@ import pytest
 from peatland_time_series.sy import calculate_sy
 
 TIME_SERIES_PATH = './tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_naturnah_sp.csv'
-EXPECTED_RESULT_PATH = './tests/data/expected_results.csv'
-EXPECTED_COLUMNS = ['date_beginning', 'date_ending', 'precision_sum', 'max_wtd', 'min_wtd',
+EXPECTED_RESULT_PATH = './tests/data/sy.csv'
+EXPECTED_COLUMNS = ['date_beginning', 'date_ending', 'precipitation_sum', 'max_wtd', 'min_wtd',
                     'durations', 'intensities', 'delta_h', 'depth', 'sy', 'idx_max', 'idx_min',
                     'accuracy_mean', 'accuracy_std']
 
