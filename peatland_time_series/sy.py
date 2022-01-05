@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Union
 
 import numpy as np
@@ -11,7 +12,7 @@ def calculate_sy(
         max_hour: int = 5,
         threshold: float = 0.3,
         resample: Union[pandas.DateOffset, pandas.Timedelta, str] = 'H') -> pd.DataFrame:
-    """Calculate the Specific Yield (Sy) from .
+    """Calculate the Specific Yield (Sy) from given time series.
 
     Parameters
     ----------
@@ -61,12 +62,12 @@ def calculate_sy(
 
     ####### ISOLATION_PRECIPITATION_EVENT ######
     list_event = list()
-    precision_sum = np.zeros(len(gap61))
+    precipitation_sum = np.zeros(len(gap61))
     for j in range(0, len(gap61)):
         precision_event = position60[gap61[j] + 1:gap60[j] + 1]
         list_event.append(precision_event)
 
-        precision_sum[j] = df_precision.iloc[precision_event].sum().values
+        precipitation_sum[j] = df_precision.iloc[precision_event].sum().values
 
     ####### BEGIN_END_NB_EVENTS #######
     beginning = position60[gap61 + 1]
@@ -112,16 +113,16 @@ def calculate_sy(
             durations.append((date_ending - date_beginning).seconds // 3600)
 
     durations_array = np.array(durations)
-    intensities = precision_sum / durations_array
+    intensities = precipitation_sum / durations_array
     delta_h = max_wtd - min_wtd
-    sy = (precision_sum / delta_h) / 1000
+    sy = (precipitation_sum / delta_h) / 1000
     depth = (max_wtd + min_wtd) / 2
 
     ######## CREATE SUMMARY TABLE ########
     summary_table = pd.DataFrame({
         'date_beginning': dates_beginning,
         'date_ending': dates_ending,
-        'precision_sum': precision_sum,
+        'precipitation_sum': precipitation_sum,
         'max_wtd': max_wtd,
         'min_wtd': min_wtd,
         'durations': durations,
@@ -136,3 +137,16 @@ def calculate_sy(
     })
 
     return summary_table
+
+
+def read_sy(csv_file: str) -> pandas.DataFrame:
+    sy = pandas.read_csv(csv_file)
+
+    # Dates are of string type, they have to be converted to datetime to be usable.
+    sy['date_beginning'] = pandas.to_datetime(sy['date_beginning'])
+    sy['date_ending'] = pandas.to_datetime(sy['date_ending'])
+
+    sy['idx_min'] = pandas.to_datetime(sy['idx_min'])
+    sy['idx_max'] = pandas.to_datetime(sy['idx_max'])
+
+    return sy
