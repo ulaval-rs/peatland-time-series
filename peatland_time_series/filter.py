@@ -13,10 +13,10 @@ def filter_sy(
         depth_max: Optional[float] = None,
         delta_h_min: Optional[float] = None,
         delta_h_max: Optional[float] = None,
-        date_beginning_min: Optional[float] = None,
-        date_beginning_max: Optional[float] = None,
-        date_ending_min: Optional[float] = None,
-        date_ending_max: Optional[float] = None,
+        date_beginning_min: Optional[pandas.Timestamp] = None,
+        date_beginning_max: Optional[pandas.Timestamp] = None,
+        date_ending_min: Optional[pandas.Timestamp] = None,
+        date_ending_max: Optional[pandas.Timestamp] = None,
         intesities_min: Optional[float] = None,
         intesities_max: Optional[float] = None) -> pandas.DataFrame:
     """Filter the Specific Yield (Sy).

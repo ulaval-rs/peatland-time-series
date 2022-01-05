@@ -1,16 +1,17 @@
+from datetime import datetime
 from typing import Dict
 
 import pandas
 import pytest
-
 from peatland_time_series.filter import filter_sy
+from peatland_time_series.sy import read_sy
 
 SY_PATH = './tests/data/sy.csv'
 
 
 @pytest.fixture
 def sy():
-    return pandas.read_csv(SY_PATH)
+    return read_sy(SY_PATH)
 
 
 @pytest.mark.parametrize('filters, tolerances', [
@@ -22,9 +23,15 @@ def sy():
      }),
     ({
          'sy_min': 0.2,
-         'sy_max': 0.25
+         'sy_max': 0.25,
+         'date_beginning_min': pandas.Timestamp('2011-08-03 22:00:00'),
+         'date_beginning_max': pandas.Timestamp('2011-08-31 06:00:00'),
+         'date_ending_min': pandas.Timestamp('2011-08-11 04:00:00'),
+         'date_ending_max': pandas.Timestamp('2011-08-30 01:00:00'),
      }, {
-         'sy': (0.2, 0.25)
+         'sy': (0.2, 0.25),
+         'date_beginning': (pandas.Timestamp('2011-08-03 22:00:00'), pandas.Timestamp('2011-08-31 06:00:00')),
+         'date_ending': (pandas.Timestamp('2011-08-11 04:00:00'), pandas.Timestamp('2011-08-30 01:00:00')),
      }),
 ])
 def test_filter(sy: pandas.DataFrame, filters: Dict, tolerances: Dict):
