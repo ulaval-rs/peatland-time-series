@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Union
 
 import numpy as np
@@ -136,3 +137,16 @@ def calculate_sy(
     })
 
     return summary_table
+
+
+def read_sy(csv_file: str) -> pandas.DataFrame:
+    sy = pandas.read_csv(csv_file)
+
+    # Dates are of string type, they have to be converted to datetime to be usable.
+    sy['date_beginning'] = pandas.to_datetime(sy['date_beginning'])
+    sy['date_ending'] = pandas.to_datetime(sy['date_ending'])
+
+    sy['idx_min'] = pandas.to_datetime(sy['idx_min'])
+    sy['idx_max'] = pandas.to_datetime(sy['idx_max'])
+
+    return sy

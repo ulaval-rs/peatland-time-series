@@ -2,10 +2,10 @@ import numpy
 import pandas
 import pytest
 
-from peatland_time_series.sy import calculate_sy
+from peatland_time_series.sy import calculate_sy, read_sy
 
 TIME_SERIES_PATH = './tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_naturnah_sp.csv'
-EXPECTED_RESULT_PATH = './tests/data/sy.csv'
+SY_PATH = './tests/data/sy.csv'
 EXPECTED_COLUMNS = ['date_beginning', 'date_ending', 'precipitation_sum', 'max_wtd', 'min_wtd',
                     'durations', 'intensities', 'delta_h', 'depth', 'sy', 'idx_max', 'idx_min',
                     'accuracy_mean', 'accuracy_std']
@@ -18,7 +18,7 @@ def time_series():
 
 @pytest.fixture
 def expected_result():
-    return pandas.read_csv(EXPECTED_RESULT_PATH)
+    return pandas.read_csv(SY_PATH)
 
 
 def test_calculate_sy(time_series, expected_result):
@@ -35,3 +35,15 @@ def test_calculate_sy(time_series, expected_result):
             continue
 
         assert abs(i - j) < 1e-15  # Ignoring numerical difference (~1e-16)
+
+
+def test_read_sy():
+    result = read_sy(SY_PATH)
+
+    for expected_column in EXPECTED_COLUMNS:
+        assert expected_column in result.columns, f'Missing "{expected_column}" column in result'
+
+    assert pandas.api.types.is_datetime64_dtype(result['date_beginning'])
+    assert pandas.api.types.is_datetime64_dtype(result['date_ending'])
+    assert pandas.api.types.is_datetime64_dtype(result['idx_min'])
+    assert pandas.api.types.is_datetime64_dtype(result['idx_max'])
