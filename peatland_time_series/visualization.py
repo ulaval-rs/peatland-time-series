@@ -50,8 +50,8 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
         indexes = event.ind
         for index in indexes:
             selected_indexes.add(index)
-            scatter_plot._facecolors[index] = numpy.array([1, 0, 0, 1])
-            scatter_plot._edgecolors[index] = numpy.array([1, 0, 0, 1])
+            scatter_plot._facecolors[index] = numpy.array([1, 0, 0, 1])  # Set to color Red
+            scatter_plot._edgecolors[index] = numpy.array([1, 0, 0, 1])  # Set to color Red
             fig.canvas.draw()
 
     fig.canvas.mpl_connect('pick_event', on_pick)
@@ -69,3 +69,9 @@ def plot_depth(sy: pandas.DataFrame, *args, **kwargs):
     )
     plt.xlabel('Sy')
     plt.ylabel('Depth [m]')
+
+
+def plot_water_level(sy: pandas.DataFrame, *args, **kwargs):
+
+    plt.xlabel('time [h]')
+    plt.ylabel('Water level [m]')

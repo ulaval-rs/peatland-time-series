@@ -1,9 +1,12 @@
-from datetime import datetime
 from typing import Union
 
 import numpy as np
 import pandas
 import pandas as pd
+
+SY_DATAFRAME_COLUMNS = ['date_beginning', 'date_ending', 'precipitation_sum', 'max_wtd', 'min_wtd',
+                        'durations', 'intensities', 'delta_h', 'depth', 'sy', 'idx_max', 'idx_min',
+                        'accuracy_mean', 'accuracy_std']
 
 
 def calculate_sy(
@@ -20,7 +23,7 @@ def calculate_sy(
         DataFrame of time series with at least the 3 following columns: 'date', 'data_wtd' and 'data_prec'.
         'date' refers to the date of the data acquisition ("YYYY-MM-DD hh:mm:ss", ex. "2011-06-15 15:00:00").
         'data_wtd' refers to the water table depth to the surface.
-        'data_prec' refers to the precision of the measure.
+        'data_prec' refers to the precipitation measure.
     gap : int
         Time which makes it possible to isolate rainy events.
         For example, if it does not rain for 6 hours and the gap parameter is equal to 5,
@@ -40,21 +43,21 @@ def calculate_sy(
     ####### DEFINE_DATA ########
     time = time_series['date'].astype('datetime64[ns]')
     water_table_depth = time_series['data_wtd']
-    precision = time_series['data_prec']
+    precipitation = time_series['data_prec']
 
     ####### TRANSFORM_IN_PANDAS_DATAFRAME #######
     df_water_table_depth = pd.DataFrame(water_table_depth)
     df_water_table_depth.index = time
 
-    df_precision = pd.DataFrame(precision)
-    df_precision.index = time
+    df_precipitation = pd.DataFrame(precipitation)
+    df_precipitation.index = time
 
     ####### RESAMPLE DATA #########
     df_water_table_depth = df_water_table_depth.resample(resample).mean()
-    df_precision = df_precision.resample(resample).sum()
+    df_precipitation = df_precipitation.resample(resample).sum()
 
     ####### FIND PRECIPITATION EVENTS #########
-    position60 = np.array(np.where(df_precision.data_prec.values > threshold)).squeeze()
+    position60 = np.array(np.where(df_precipitation.data_prec.values > threshold)).squeeze()
     diff60 = np.diff(position60)
     gap60 = np.array(np.where(diff60 >= gap)).squeeze()
     gap61 = np.insert(gap60, 0, -1)
@@ -64,16 +67,16 @@ def calculate_sy(
     list_event = list()
     precipitation_sum = np.zeros(len(gap61))
     for j in range(0, len(gap61)):
-        precision_event = position60[gap61[j] + 1:gap60[j] + 1]
-        list_event.append(precision_event)
+        precipitation_event = position60[gap61[j] + 1:gap60[j] + 1]
+        list_event.append(precipitation_event)
 
-        precipitation_sum[j] = df_precision.iloc[precision_event].sum().values
+        precipitation_sum[j] = df_precipitation.iloc[precipitation_event].sum().values
 
     ####### BEGIN_END_NB_EVENTS #######
     beginning = position60[gap61 + 1]
     end = position60[gap60]
-    dates_beginning = df_precision.iloc[position60[gap61 + 1]].index
-    dates_ending = df_precision.iloc[position60[gap60]].index
+    dates_beginning = df_precipitation.iloc[position60[gap61 + 1]].index
+    dates_ending = df_precipitation.iloc[position60[gap60]].index
 
     ######## CREATE_MATRIX_FOR_MIN_MAX_IDENTIFICATION ########
     water_table_depths = list()
@@ -139,8 +142,28 @@ def calculate_sy(
     return summary_table
 
 
-def read_sy(csv_file: str) -> pandas.DataFrame:
-    sy = pandas.read_csv(csv_file)
+def read_sy(filepath: str) -> pandas.DataFrame:
+    """Read the Sy file as a DataFrame.
+
+    Read the Sy csv file which was precedently calculated with
+    the `calculate_sy` function and saved as sy_df.to_csv(...).
+
+    Parameters
+    ----------
+    filepath
+        CSV like file of Sy (see the `calculate_sy` for more information
+        on the format).
+
+    Returns
+    -------
+    pandas.DataFrame
+        DataFrame of the Sy with related infromation.
+    """
+    sy = pandas.read_csv(filepath)
+
+    for column in SY_DATAFRAME_COLUMNS:
+        if column not in sy.columns:
+            raise ValueError(f"Columns \"{', '.join(SY_DATAFRAME_COLUMNS)}\" must be in the Sy file: \"{filepath}\"")
 
     # Dates are of string type, they have to be converted to datetime to be usable.
     sy['date_beginning'] = pandas.to_datetime(sy['date_beginning'])
