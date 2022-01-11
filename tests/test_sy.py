@@ -3,9 +3,11 @@ import pandas
 import pytest
 
 from peatland_time_series.sy import calculate_sy, read_sy
+from peatland_time_series.time_series import read_time_series
 
 TIME_SERIES_PATH = './tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_naturnah_sp.csv'
 SY_PATH = './tests/data/sy.csv'
+SY_BAD_PATH = './tests/data/sy-bad.csv'
 EXPECTED_COLUMNS = ['date_beginning', 'date_ending', 'precipitation_sum', 'max_wtd', 'min_wtd',
                     'durations', 'intensities', 'delta_h', 'depth', 'sy', 'idx_max', 'idx_min',
                     'accuracy_mean', 'accuracy_std']
@@ -13,7 +15,7 @@ EXPECTED_COLUMNS = ['date_beginning', 'date_ending', 'precipitation_sum', 'max_w
 
 @pytest.fixture
 def time_series():
-    return pandas.read_csv(TIME_SERIES_PATH)
+    return read_time_series(TIME_SERIES_PATH)
 
 
 @pytest.fixture
@@ -47,3 +49,8 @@ def test_read_sy():
     assert pandas.api.types.is_datetime64_dtype(result['date_ending'])
     assert pandas.api.types.is_datetime64_dtype(result['idx_min'])
     assert pandas.api.types.is_datetime64_dtype(result['idx_max'])
+
+
+def test_read_bad_sy():
+    with pytest.raises(ValueError):
+        read_sy(SY_BAD_PATH)
