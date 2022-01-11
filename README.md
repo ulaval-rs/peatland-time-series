@@ -58,7 +58,7 @@ visualization.show_water_level(
 )
 ```
 Output:
-![water_level_by_time](https://github.com/ulaval-rs/peatland-time-series/blob/main/doc/images/water_level_by_time1.png)
+![water_level_by_time](https://github.com/ulaval-rs/peatland-time-series/blob/main/docs/images/water_level_by_time1.png)
 
 For more information, see the `visualization.show_water_level` docstring. 
 
@@ -77,7 +77,7 @@ plt.legend()
 plt.show()
 ```
 Output:
-![depth_by_sy](https://github.com/ulaval-rs/peatland-time-series/blob/main/doc/images/depth_by_sy.png)
+![depth_by_sy](https://github.com/ulaval-rs/peatland-time-series/blob/main/docs/images/depth_by_sy.png)
 
 
 ### Interactively select data points.
