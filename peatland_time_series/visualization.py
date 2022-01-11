@@ -62,7 +62,41 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
     return selected_indexes
 
 
-def plot_depth(sy: pandas.DataFrame, *args, **kwargs):
+def plot_depth(sy: pandas.DataFrame, *args, **kwargs) -> None:
+    """Plot the depth in function of Sy.
+    
+    Examples
+    --------
+    ```python
+        time_series = read_time_series('tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_siteam5.csv')
+    sy1 = calculate_sy(time_series=time_series)
+
+    time_series2 = read_time_series('tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_siteam4.csv')
+    sy2 = calculate_sy(time_series=time_series2)
+
+    sy1 = filter_sy(sy1, sy_min=0, delta_h_min=.01, precipitation_sum_min=10, precipitation_sum_max=100)
+    sy2 = filter_sy(sy2, sy_min=0, delta_h_min=.01, precipitation_sum_min=10, precipitation_sum_max=100)
+
+    visualization.plot_depth(sy1, label='Sy 1', color='blue')
+    visualization.plot_depth(sy2, label='Sy 2', color='red')
+    plt.legend()
+
+    plt.show()
+    ```
+
+    Parameters
+    ----------
+    sy
+        DataFrame of Sy, obtained by the `calculate_sy` function.
+    args
+        Any args that will be give to to the plt.scatter plot.
+    kwargs
+        Any named args that will be give to to the plt.scatter plot.
+
+    Returns
+    -------
+    None
+    """
     plt.scatter(
         x=sy['sy'],
         y=sy['depth'],
@@ -73,7 +107,7 @@ def plot_depth(sy: pandas.DataFrame, *args, **kwargs):
     plt.ylabel('Depth [m]')
 
 
-def plot_water_level(
+def show_water_level(
         time_series: pandas.DataFrame,
         sy: pandas.DataFrame,
         event_index: int,
@@ -90,7 +124,7 @@ def plot_water_level(
     time_series = read_time_series('tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_siteam5.csv')
     sy = calculate_sy(time_series)
 
-    plot_water_level(
+    show_water_level(
         time_series,
         sy,
         event_index=30,
