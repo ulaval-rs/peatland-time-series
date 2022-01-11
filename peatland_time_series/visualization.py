@@ -1,8 +1,10 @@
-from typing import Optional, Tuple, Set
+from typing import Optional, Set, Tuple
 
 import matplotlib.pyplot as plt
 import numpy
 import pandas
+
+TWIN_COLOR = 'royalblue'
 
 
 def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = None, *args, **kwargs) -> Set[int]:
@@ -71,7 +73,97 @@ def plot_depth(sy: pandas.DataFrame, *args, **kwargs):
     plt.ylabel('Depth [m]')
 
 
-def plot_water_level(sy: pandas.DataFrame, *args, **kwargs):
+def plot_water_level(
+        time_series: pandas.DataFrame,
+        sy: pandas.DataFrame,
+        event_index: int,
+        time_before: pandas.Timedelta,
+        time_after: pandas.Timedelta,
+        fig_size: Optional[Tuple[int, int]] = None,
+        date_format: Optional[str] = '%H',
+        xlabel_rotation: Optional[int] = 0) -> None:
+    """Plot the water level in function of the time.
 
-    plt.xlabel('time [h]')
-    plt.ylabel('Water level [m]')
+    Examples
+    --------
+    ```python
+    time_series = read_time_series('tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_siteam5.csv')
+    sy = calculate_sy(time_series)
+
+    plot_water_level(
+        time_series,
+        sy,
+        event_index=30,
+        time_before=pandas.Timedelta(hours=10),
+        time_after=pandas.Timedelta(hours=20)
+    )
+    ```
+
+    Parameters
+    ----------
+    time_series
+        Time series as a DataFrame (from `read_time_series`).
+    sy
+        Sy as a DataFrame (from `calculate_sy`).
+    event_index
+        Index of the event in Sy.
+    time_before
+        pandas.Timedelta before the chosen event.
+    time_after
+        pandas.Timedelta after the chosen event.
+    date_format
+        Date format (see https://strftime.org/).
+    fig_size
+        (width, height), fig size given to plt.subplots.
+    xlabel_rotation
+        Rotation of the x axis label. This may be useful when using complete dates on the x axis.
+
+    Returns
+    -------
+    None
+    """
+    beginning = sy['date_beginning'].iloc[event_index] - time_before
+    ending = sy['date_ending'].iloc[event_index] + time_after
+
+    sub_time_series = time_series.loc[beginning:ending]
+
+    fig, ax = plt.subplots(figsize=fig_size if fig_size else (10, 6))
+
+    # Water table Depth plot
+    ax.plot(sub_time_series.index, sub_time_series['data_wtd'], color='black')
+    ax.set_xlabel('Time [h]')
+    ax.set_ylabel('Water level [m]')
+
+
+    # Twin plot for the precipitation
+    # ------------------------------------------
+    ax_precipitation = ax.twinx()
+    ax_precipitation.bar(
+        sub_time_series.index,
+        sub_time_series['data_prec'],
+        color=TWIN_COLOR,
+        alpha=0.5,
+        width=0.02
+    )
+    # Setting the color to all elements of the twin plot
+    ax_precipitation.set_ylabel('Prec. [mm]', color=TWIN_COLOR)
+    ax_precipitation.spines['right'].set_color(TWIN_COLOR)
+    ax_precipitation.tick_params(axis='y', colors=TWIN_COLOR)
+
+    # Setting the values for the x axis
+    time_values = sub_time_series.index.map(lambda x: x.strftime(date_format))
+    ax.set_xticks(sub_time_series.index, time_values, rotation=xlabel_rotation)
+
+    ax.scatter(
+        x=sy['idx_max'].iloc[[event_index]],
+        y=sy['max_wtd'].iloc[[event_index]],
+        s=100
+    )
+    ax.scatter(
+        x=sy['idx_min'].iloc[[event_index]],
+        y=sy['min_wtd'].iloc[[event_index]],
+        s=100
+    )
+
+    plt.tight_layout()
+    plt.show()

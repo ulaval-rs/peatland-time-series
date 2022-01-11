@@ -20,7 +20,8 @@ def calculate_sy(
     Parameters
     ----------
     time_series : pandas.Dataframe
-        DataFrame of time series with at least the 3 following columns: 'date', 'data_wtd' and 'data_prec'.
+        DataFrame of time series gotten from the `read_time_series` function.
+         The DataFrame have at least the  following columns: 'date', 'data_wtd' and 'data_prec'.
         'date' refers to the date of the data acquisition ("YYYY-MM-DD hh:mm:ss", ex. "2011-06-15 15:00:00").
         'data_wtd' refers to the water table depth to the surface.
         'data_prec' refers to the precipitation measure.
@@ -41,7 +42,7 @@ def calculate_sy(
         Profile of effectives porosity.
     """
     ####### DEFINE_DATA ########
-    time = time_series['date'].astype('datetime64[ns]')
+    time = time_series.index.astype('datetime64[ns]')  # the index is the 'date' column
     water_table_depth = time_series['data_wtd']
     precipitation = time_series['data_prec']
 

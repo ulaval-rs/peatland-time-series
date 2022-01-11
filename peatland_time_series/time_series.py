@@ -28,4 +28,6 @@ def read_time_series(filepath: str) -> pandas.DataFrame:
     time_series = time_series[TIME_SERIES_COLUMNS]  # Keeping only these columns
     time_series['date'] = pandas.to_datetime(time_series['date'])  # Getting dates
 
+    time_series = time_series.set_index('date')
+
     return time_series
