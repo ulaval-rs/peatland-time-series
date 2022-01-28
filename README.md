@@ -68,21 +68,20 @@ Note that the Sy DataFrame can by filtered with the `filter_sy` function.
 ```python
 time_series = read_time_series('path/to/time-series.csv')
 sy = calculate_sy(time_series=time_series)
-
 sy = filter_sy(sy, sy_min=0, delta_h_min=.01, precipitation_sum_min=10, precipitation_sum_max=100)
 
-visualization.show_depth(sy, label='Depth', color='blue')
+visualization.show_depth(sy, heigh_of_file=-3)
 ```
 Output:
 ![depth_by_sy](https://github.com/ulaval-rs/peatland-time-series/blob/main/docs/images/depth_by_sy.png)
 
 
 ### Interactively select data points.
-The `visualization.show_selector` plots an interactive selector of the Depth(Sy)
+The `visualization.show_depth(..., select=True)` funtion plots an interactive selector of the Depth(Sy)
 graph. You can click on the data points you wish to exclude.
 A set of indexes of the selected data points is returned.
 ```python
-selected_indexes = show_selector(sy)
+selected_indexes = show_depth(sy, select=True)
 
 # selected_indexes
 {0, 100, 5, 101, 103, 46, 79, 47, 19, 24}

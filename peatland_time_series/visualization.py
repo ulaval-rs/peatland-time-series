@@ -1,4 +1,5 @@
 from typing import Optional, Set, Tuple
+from warnings import warn
 
 import matplotlib.pyplot as plt
 import numpy
@@ -41,6 +42,8 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
     Set[int]
         A set of indexes of the selected data points.
     """
+    warn('This function is deprecated, use "show_depth(..., select=True)" instead.', DeprecationWarning, stacklevel=2)
+
     if figsize:
         fig, ax = plt.subplots(figsize=figsize)
     else:
@@ -66,7 +69,9 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
     return selected_indexes
 
 
-def show_depth(sy: pandas.DataFrame, height_of_line: Optional[float] = None, *args, **kwargs) -> None:
+def show_depth(sy: pandas.DataFrame,
+               height_of_line: Optional[float] = None,
+               select: bool = False) -> Optional[Set[int]]:
     """Plot the depth in function of Sy.
 
     Examples
@@ -77,21 +82,26 @@ def show_depth(sy: pandas.DataFrame, height_of_line: Optional[float] = None, *ar
 
     sy = filter_sy(sy, sy_min=0, delta_h_min=.01, precipitation_sum_min=10, precipitation_sum_max=100)
 
-    visualization.show_depth(sy)
+    visualization.show_depth(sy, height_of_line=2)
+    # For selecting indexes (for removing data points for exemple)
+    selected_indexes = visualization.show_depth(sy, select=True)
     ```
 
     Parameters
     ----------
     sy
         DataFrame of Sy, obtained by the `calculate_sy` function.
-    args
-        Any args that will be give to to the plt.scatter plot.
-    kwargs
-        Any named args that will be give to to the plt.scatter plot.
+    height_of_line
+        Optional, draw an asymptote line at specified height.
+    select
+        If True, the data points can be selected on the plot.
+        When the plot is closed, the index of the selected data points
+        are returned.
 
     Returns
     -------
-    None
+    Optional[Set[int]]
+        None if "select" is False (default). Set of selected indexes if "select" is True.
     """
     fig, ax = plt.subplots(figsize=(10, 6))
 
@@ -108,22 +118,21 @@ def show_depth(sy: pandas.DataFrame, height_of_line: Optional[float] = None, *ar
         c='gray',
         fmt=',',  # Marker is a pixel
         alpha=.5,
-        zorder=-1  # Vizualy set the plot behind others
+        zorder=-1  # Visualy set the plot behind others
     )
 
     # For the scatter plot
-    scatter = ax.scatter(x=sy['sy'], y=sy['min_wtd'],
-                         c=precepitation_sum, s=precepitation_sum,
-                         vmin=min(precepitation_sum), vmax=max(precepitation_sum))
-    fig.colorbar(scatter, label='Precipitation sum [mm]')
+    scatter_plot = ax.scatter(x=sy['sy'], y=sy['min_wtd'],
+                              c=precepitation_sum, s=precepitation_sum,
+                              vmin=min(precepitation_sum), vmax=max(precepitation_sum),
+                              picker=select)
+    fig.colorbar(scatter_plot, label='Precipitation sum [mm]')
 
     # Plotting the "asymptote" line
     sorted_sy = np.sort(sy['sy'])
 
-    if not height_of_line:
-        height_of_line = max(sy['max_wtd'].values)
-
-    ax.plot(sorted_sy, [height_of_line for _ in sorted_sy], '--', color='gray', alpha=.5)
+    if height_of_line is not None:
+        ax.plot(sorted_sy, [height_of_line for _ in sorted_sy], '--', color='gray', alpha=.5)
 
     # Curve fit
     pars, cov = curve_fit(f=power_law, xdata=sy['sy'].values, ydata=sy['min_wtd'])
@@ -138,6 +147,22 @@ def show_depth(sy: pandas.DataFrame, height_of_line: Optional[float] = None, *ar
     ax.set_ylabel('Depth [cm]')
 
     plt.tight_layout()
+
+    if select:
+        selected_indexes = set()
+
+        def on_pick(event):
+            indexes = event.ind
+            for index in indexes:
+                selected_indexes.add(index)
+                scatter_plot._sizes[index] = 0
+                fig.canvas.draw()
+
+        fig.canvas.mpl_connect('pick_event', on_pick)
+        plt.show()
+
+        return selected_indexes
+
     plt.show()
 
 
