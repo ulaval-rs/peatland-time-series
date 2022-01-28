@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "peatland_time_series"
-version = "0.1.1"
-description = ""
+version = "0.1.2"
+description = "Analyze water retention in peatland from time series of precipitation and water table depth"
 authors = ["Gabriel Couture <gacou54@ulaval.ca>"]
 license = "BSD-3-Clause"
 homepage = "https://github.com/ulaval-rs/peatland-time-series"
