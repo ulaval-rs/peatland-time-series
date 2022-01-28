@@ -95,40 +95,47 @@ def show_depth(sy: pandas.DataFrame, height_of_line: Optional[float] = None, *ar
     """
     fig, ax = plt.subplots(figsize=(10, 6))
 
+    sy['depth'] = sy['depth'] * 100  # To have the values in cm rather than m
+    sy['min_wtd'] = sy['min_wtd'] * 100  # To have the values in cm rather than m
+    sy['max_wtd'] = sy['max_wtd'] * 100  # To have the values in cm rather than m
     precepitation_sum = sy['precipitation_sum'].values
 
     # For the error bars
-    _, errorbar, _ = ax.errorbar(
+    ax.errorbar(
         x=sy['sy'],
-        y=sy['min_wtd'],
+        y=sy['depth'],
         yerr=(sy['min_wtd'] - sy['max_wtd']) / 2,
         c='gray',
         fmt=',',  # Marker is a pixel
-        uplims=True,  # To only have the top error
         alpha=.5,
         zorder=-1  # Vizualy set the plot behind others
     )
-    errorbar[0].set_marker(',')
 
     # For the scatter plot
     scatter = ax.scatter(x=sy['sy'], y=sy['min_wtd'],
                          c=precepitation_sum, s=precepitation_sum,
                          vmin=min(precepitation_sum), vmax=max(precepitation_sum))
-    ax.set_xlabel('Sy')
-    ax.set_ylabel('Depth [m]')
     fig.colorbar(scatter, label='Precipitation sum [mm]')
 
     # Plotting the "asymptote" line
     sorted_sy = np.sort(sy['sy'])
 
     if not height_of_line:
-        height_of_line = max(sy['depth'].values)
+        height_of_line = max(sy['max_wtd'].values)
 
     ax.plot(sorted_sy, [height_of_line for _ in sorted_sy], '--', color='gray', alpha=.5)
 
     # Curve fit
     pars, cov = curve_fit(f=power_law, xdata=sy['sy'].values, ydata=sy['min_wtd'])
     ax.plot(sorted_sy, power_law(sorted_sy, pars[0], pars[1]), color='gray', alpha=.5)
+
+    ax.set_ylim((-100, 0))
+    ax.set_xlim((0, 1))
+
+    ax.xaxis.set_ticks_position('top')  # Putting x-axis on top
+    ax.xaxis.set_label_position('top')
+    ax.set_xlabel('Sy')
+    ax.set_ylabel('Depth [cm]')
 
     plt.tight_layout()
     plt.show()
