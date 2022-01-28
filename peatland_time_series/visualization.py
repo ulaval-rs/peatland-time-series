@@ -68,10 +68,10 @@ def plot_depth(sy: pandas.DataFrame, *args, **kwargs) -> None:
     Examples
     --------
     ```python
-        time_series = read_time_series('tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_siteam5.csv')
+        time_series = read_time_series('./tests/data/kmr_area_c.csv')
     sy1 = calculate_sy(time_series=time_series)
 
-    time_series2 = read_time_series('tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_siteam4.csv')
+    time_series2 = read_time_series('./tests/data/kmr_area_c.csv')
     sy2 = calculate_sy(time_series=time_series2)
 
     sy1 = filter_sy(sy1, sy_min=0, delta_h_min=.01, precipitation_sum_min=10, precipitation_sum_max=100)
@@ -121,7 +121,7 @@ def show_water_level(
     Examples
     --------
     ```python
-    time_series = read_time_series('tests/data/time_series/time_series/ahlenmoor/ahlenmoor_af_siteam5.csv')
+    time_series = read_time_series('./tests/data/kmr_area_c.csv')
     sy = calculate_sy(time_series)
 
     show_water_level(

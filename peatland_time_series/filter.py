@@ -21,6 +21,16 @@ def filter_sy(
         intesities_max: Optional[float] = None) -> pandas.DataFrame:
     """Filter the Specific Yield (Sy).
 
+    Examples
+    --------
+    ```python
+    sy = filter_sy(
+        sy,
+        precipitation_sum_min=2,
+        date_beginning_min=pandas.Timestamp(year=2009, month=7, day=3, hour=9),
+    )
+    ```
+
     Parameters
     ----------
     sy
@@ -71,9 +81,9 @@ def _filter_sy(sy: pandas.DataFrame, **kwargs) -> pandas.DataFrame:
             key, min_or_max = key.rsplit('_', 1)  # Only split on the last occurence
 
             if min_or_max == 'min':
-                sy = sy[sy[key] > value]
+                sy = sy[sy[key] >= value]
 
             elif min_or_max == 'max':
-                sy = sy[sy[key] < value]
+                sy = sy[sy[key] <= value]
 
     return sy
