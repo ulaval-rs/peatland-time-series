@@ -71,10 +71,7 @@ sy = calculate_sy(time_series=time_series)
 
 sy = filter_sy(sy, sy_min=0, delta_h_min=.01, precipitation_sum_min=10, precipitation_sum_max=100)
 
-visualization.plot_depth(sy, label='Depth', color='blue')
-plt.legend()
-
-plt.show()
+visualization.show_depth(sy, label='Depth', color='blue')
 ```
 Output:
 ![depth_by_sy](https://github.com/ulaval-rs/peatland-time-series/blob/main/docs/images/depth_by_sy.png)

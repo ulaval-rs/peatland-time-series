@@ -2,7 +2,11 @@ from typing import Optional, Set, Tuple
 
 import matplotlib.pyplot as plt
 import numpy
+import numpy as np
 import pandas
+from scipy.optimize import curve_fit
+
+from .util import power_law
 
 TWIN_COLOR = 'royalblue'
 
@@ -62,13 +66,81 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
     return selected_indexes
 
 
+def show_depth(sy: pandas.DataFrame, height_of_line: Optional[float] = None, *args, **kwargs) -> None:
+    """Plot the depth in function of Sy.
+
+    Examples
+    --------
+    ```python
+    time_series = read_time_series('./tests/data/kmr_area_c.csv')
+    sy = calculate_sy(time_series=time_series)
+
+    sy = filter_sy(sy, sy_min=0, delta_h_min=.01, precipitation_sum_min=10, precipitation_sum_max=100)
+
+    visualization.show_depth(sy)
+    ```
+
+    Parameters
+    ----------
+    sy
+        DataFrame of Sy, obtained by the `calculate_sy` function.
+    args
+        Any args that will be give to to the plt.scatter plot.
+    kwargs
+        Any named args that will be give to to the plt.scatter plot.
+
+    Returns
+    -------
+    None
+    """
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    precepitation_sum = sy['precipitation_sum'].values
+
+    # For the error bars
+    _, errorbar, _ = ax.errorbar(
+        x=sy['sy'],
+        y=sy['min_wtd'],
+        yerr=(sy['min_wtd'] - sy['max_wtd']) / 2,
+        c='gray',
+        fmt=',',  # Marker is a pixel
+        uplims=True,  # To only have the top error
+        alpha=.5,
+        zorder=-1  # Vizualy set the plot behind others
+    )
+    errorbar[0].set_marker(',')
+
+    # For the scatter plot
+    scatter = ax.scatter(x=sy['sy'], y=sy['min_wtd'],
+                         c=precepitation_sum, s=precepitation_sum,
+                         vmin=min(precepitation_sum), vmax=max(precepitation_sum))
+    ax.set_xlabel('Sy')
+    ax.set_ylabel('Depth [m]')
+    fig.colorbar(scatter, label='Precipitation sum [mm]')
+
+    # Plotting the "asymptote" line
+    sorted_sy = np.sort(sy['sy'])
+
+    if not height_of_line:
+        height_of_line = max(sy['depth'].values)
+
+    ax.plot(sorted_sy, [height_of_line for _ in sorted_sy], '--', color='gray', alpha=.5)
+
+    # Curve fit
+    pars, cov = curve_fit(f=power_law, xdata=sy['sy'].values, ydata=sy['min_wtd'])
+    ax.plot(sorted_sy, power_law(sorted_sy, pars[0], pars[1]), color='gray', alpha=.5)
+
+    plt.tight_layout()
+    plt.show()
+
+
 def plot_depth(sy: pandas.DataFrame, *args, **kwargs) -> None:
     """Plot the depth in function of Sy.
     
     Examples
     --------
     ```python
-        time_series = read_time_series('./tests/data/kmr_area_c.csv')
+    time_series = read_time_series('./tests/data/kmr_area_c.csv')
     sy1 = calculate_sy(time_series=time_series)
 
     time_series2 = read_time_series('./tests/data/kmr_area_c.csv')
@@ -167,7 +239,6 @@ def show_water_level(
     ax.plot(sub_time_series.index, sub_time_series['data_wtd'], color='black')
     ax.set_xlabel('Time [h]')
     ax.set_ylabel('Water level [m]')
-
 
     # Twin plot for the precipitation
     # ------------------------------------------
