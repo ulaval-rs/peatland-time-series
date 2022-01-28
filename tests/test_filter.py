@@ -40,7 +40,7 @@ def test_filter(sy: pandas.DataFrame, filters: Dict, tolerances: Dict):
     for key, value in tolerances.items():
         min_tolerance, max_tolerance = value
 
-        valid_check = (result[key] > min_tolerance) & (result[key] < max_tolerance)
+        valid_check = (result[key] >= min_tolerance) & (result[key] <= max_tolerance)
 
         assert valid_check.all(), f"Some of the \"{key}\" values were not in the tolerances [{min_tolerance}, {max_tolerance}]."
 
