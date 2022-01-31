@@ -77,7 +77,7 @@ Output:
 
 
 ### Interactively select data points.
-The `visualization.show_depth(..., select=True)` funtion plots an interactive selector of the Depth(Sy)
+The `visualization.show_depth(..., select=True)` function plots an interactive selector of the Depth(Sy)
 graph. You can click on the data points you wish to exclude.
 A set of indexes of the selected data points is returned.
 ```python
