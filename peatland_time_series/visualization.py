@@ -1,7 +1,8 @@
-from typing import Optional, Set, Tuple
+from typing import Optional, Set, Tuple, Union
 from warnings import warn
 
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import numpy
 import numpy as np
 import pandas
@@ -71,7 +72,8 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
 
 def show_depth(sy: pandas.DataFrame,
                height_of_line: Optional[float] = None,
-               select: bool = False) -> Optional[Set[int]]:
+               select: bool = False,
+               show_plot: bool = True) -> Optional[Union[Set[int], plt.Figure]]:
     """Plot the depth in function of Sy.
 
     Examples
@@ -97,10 +99,12 @@ def show_depth(sy: pandas.DataFrame,
         If True, the data points can be selected on the plot.
         When the plot is closed, the index of the selected data points
         are returned.
+    show_plot
+        If True, "plt.show()" is called, if False, the figure is return.
 
     Returns
     -------
-    Optional[Set[int]]
+    Optional[Union[Set[int], matplotlib.figure.Figure]]
         None if "select" is False (default). Set of selected indexes if "select" is True.
     """
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -162,6 +166,9 @@ def show_depth(sy: pandas.DataFrame,
         plt.show()
 
         return selected_indexes
+    
+    if not show_plot:
+        return fig
 
     plt.show()
 
@@ -219,7 +226,8 @@ def show_water_level(
         time_after: pandas.Timedelta,
         fig_size: Optional[Tuple[int, int]] = None,
         date_format: Optional[str] = '%H',
-        xlabel_rotation: Optional[int] = 0) -> None:
+        xlabel_rotation: Optional[int] = 0,
+        show_plot: bool = True) -> Optional[plt.Figure]:
     """Plot the water level in function of the time.
 
     Examples
@@ -255,10 +263,13 @@ def show_water_level(
         (width, height), fig size given to plt.subplots.
     xlabel_rotation
         Rotation of the x axis label. This may be useful when using complete dates on the x axis.
+    show_plot
+        If True, "plt.show()" is called, if False, the figure is return.
 
     Returns
     -------
-    None
+    Optional[matplotlib.figure.Figure]
+        If "show_plot" is True, returns the plt.Figure. If False, returns None.
     """
     beginning = sy['date_beginning'].iloc[event_index] - time_before
     ending = sy['date_ending'].iloc[event_index] + time_after
@@ -287,10 +298,6 @@ def show_water_level(
     ax_precipitation.spines['right'].set_color(TWIN_COLOR)
     ax_precipitation.tick_params(axis='y', colors=TWIN_COLOR)
 
-    # Setting the values for the x axis
-    time_values = sub_time_series.index.map(lambda x: x.strftime(date_format))
-    ax.set_xticks(sub_time_series.index, time_values, rotation=xlabel_rotation)
-
     ax.scatter(
         x=sy['idx_max'].iloc[[event_index]],
         y=sy['max_wtd'].iloc[[event_index]],
@@ -301,6 +308,13 @@ def show_water_level(
         y=sy['min_wtd'].iloc[[event_index]],
         s=100
     )
+    
+    date_formater = mdates.DateFormatter(date_format)
+    ax.xaxis.set_major_formatter(date_formater)
 
     plt.tight_layout()
+    
+    if not show_plot:
+        return fig
+    
     plt.show()
