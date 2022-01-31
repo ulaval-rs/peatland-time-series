@@ -1,8 +1,13 @@
 from typing import Optional, Set, Tuple
+from warnings import warn
 
 import matplotlib.pyplot as plt
 import numpy
+import numpy as np
 import pandas
+from scipy.optimize import curve_fit
+
+from .util import power_law
 
 TWIN_COLOR = 'royalblue'
 
@@ -37,6 +42,8 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
     Set[int]
         A set of indexes of the selected data points.
     """
+    warn('This function is deprecated, use "show_depth(..., select=True)" instead.', DeprecationWarning, stacklevel=2)
+
     if figsize:
         fig, ax = plt.subplots(figsize=figsize)
     else:
@@ -62,13 +69,110 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
     return selected_indexes
 
 
+def show_depth(sy: pandas.DataFrame,
+               height_of_line: Optional[float] = None,
+               select: bool = False) -> Optional[Set[int]]:
+    """Plot the depth in function of Sy.
+
+    Examples
+    --------
+    ```python
+    time_series = read_time_series('./tests/data/kmr_area_c.csv')
+    sy = calculate_sy(time_series=time_series)
+
+    sy = filter_sy(sy, sy_min=0, delta_h_min=.01, precipitation_sum_min=10, precipitation_sum_max=100)
+
+    visualization.show_depth(sy, height_of_line=2)
+    # For selecting indexes (for removing data points for exemple)
+    selected_indexes = visualization.show_depth(sy, select=True)
+    ```
+
+    Parameters
+    ----------
+    sy
+        DataFrame of Sy, obtained by the `calculate_sy` function.
+    height_of_line
+        Optional, draw an asymptote line at specified height.
+    select
+        If True, the data points can be selected on the plot.
+        When the plot is closed, the index of the selected data points
+        are returned.
+
+    Returns
+    -------
+    Optional[Set[int]]
+        None if "select" is False (default). Set of selected indexes if "select" is True.
+    """
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    sy['depth'] = sy['depth'] * 100  # To have the values in cm rather than m
+    sy['min_wtd'] = sy['min_wtd'] * 100  # To have the values in cm rather than m
+    sy['max_wtd'] = sy['max_wtd'] * 100  # To have the values in cm rather than m
+    precepitation_sum = sy['precipitation_sum'].values
+
+    # For the error bars
+    ax.errorbar(
+        x=sy['sy'],
+        y=sy['depth'],
+        yerr=(sy['min_wtd'] - sy['max_wtd']) / 2,
+        c='gray',
+        fmt=',',  # Marker is a pixel
+        alpha=.5,
+        zorder=-1  # Visualy set the plot behind others
+    )
+
+    # For the scatter plot
+    scatter_plot = ax.scatter(x=sy['sy'], y=sy['min_wtd'],
+                              c=precepitation_sum, s=precepitation_sum,
+                              vmin=min(precepitation_sum), vmax=max(precepitation_sum),
+                              picker=select)
+    fig.colorbar(scatter_plot, label='Precipitation sum [mm]')
+
+    # Plotting the "asymptote" line
+    sorted_sy = np.sort(sy['sy'])
+
+    if height_of_line is not None:
+        ax.plot(sorted_sy, [height_of_line for _ in sorted_sy], '--', color='gray', alpha=.5)
+
+    # Curve fit
+    pars, cov = curve_fit(f=power_law, xdata=sy['sy'].values, ydata=sy['min_wtd'])
+    ax.plot(sorted_sy, power_law(sorted_sy, pars[0], pars[1]), color='gray', alpha=.5)
+
+    ax.set_ylim((-100, 0))
+    ax.set_xlim((0, 1))
+
+    ax.xaxis.set_ticks_position('top')  # Putting x-axis on top
+    ax.xaxis.set_label_position('top')
+    ax.set_xlabel('Sy')
+    ax.set_ylabel('Depth [cm]')
+
+    plt.tight_layout()
+
+    if select:
+        selected_indexes = set()
+
+        def on_pick(event):
+            indexes = event.ind
+            for index in indexes:
+                selected_indexes.add(index)
+                scatter_plot._sizes[index] = 0
+                fig.canvas.draw()
+
+        fig.canvas.mpl_connect('pick_event', on_pick)
+        plt.show()
+
+        return selected_indexes
+
+    plt.show()
+
+
 def plot_depth(sy: pandas.DataFrame, *args, **kwargs) -> None:
     """Plot the depth in function of Sy.
     
     Examples
     --------
     ```python
-        time_series = read_time_series('./tests/data/kmr_area_c.csv')
+    time_series = read_time_series('./tests/data/kmr_area_c.csv')
     sy1 = calculate_sy(time_series=time_series)
 
     time_series2 = read_time_series('./tests/data/kmr_area_c.csv')
@@ -167,7 +271,6 @@ def show_water_level(
     ax.plot(sub_time_series.index, sub_time_series['data_wtd'], color='black')
     ax.set_xlabel('Time [h]')
     ax.set_ylabel('Water level [m]')
-
 
     # Twin plot for the precipitation
     # ------------------------------------------
