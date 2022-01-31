@@ -298,11 +298,6 @@ def show_water_level(
     ax_precipitation.spines['right'].set_color(TWIN_COLOR)
     ax_precipitation.tick_params(axis='y', colors=TWIN_COLOR)
 
-    # Setting the values for the x axis
-    # time_values = sub_time_series.index.map(lambda x: x.strftime(date_format))
-    # ax.set_xticks(sub_time_series.index, time_values, rotation=xlabel_rotation)
-    # plt.setp(ax.get_xticklabels())
-
     ax.scatter(
         x=sy['idx_max'].iloc[[event_index]],
         y=sy['max_wtd'].iloc[[event_index]],
