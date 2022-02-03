@@ -73,7 +73,8 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
 def show_depth(sy: pandas.DataFrame,
                height_of_line: Optional[float] = None,
                select: bool = False,
-               show_plot: bool = True) -> Optional[Union[Set[int], plt.Figure]]:
+               show_plot: bool = True,
+               show_indexes: bool = False) -> Optional[Union[Set[int], plt.Figure]]:
     """Plot the depth in function of Sy.
 
     Examples
@@ -101,6 +102,8 @@ def show_depth(sy: pandas.DataFrame,
         are returned.
     show_plot
         If True, "plt.show()" is called, if False, the figure is return.
+    show_indexes
+        If true, a label with the index will point to its corresponding data point.
 
     Returns
     -------
@@ -131,6 +134,11 @@ def show_depth(sy: pandas.DataFrame,
                               vmin=min(precepitation_sum), vmax=max(precepitation_sum),
                               picker=select)
     fig.colorbar(scatter_plot, label='Precipitation sum [mm]')
+
+    # Annotation of the data points
+    if show_indexes:
+        for index, row in sy[['sy', 'min_wtd']].iterrows():
+            ax.annotate(index, (row['sy'] + 0.01, row['min_wtd'] - 2))
 
     # Plotting the "asymptote" line
     sorted_sy = np.sort(sy['sy'])
