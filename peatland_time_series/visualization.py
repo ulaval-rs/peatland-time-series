@@ -161,8 +161,17 @@ def show_depth(sy: pandas.DataFrame,
 
     # Curve fit
     pars, cov = curve_fit(f=power_law, xdata=sy['sy'], ydata=sy['min_wtd'])
+    standard_deviation = numpy.sqrt(numpy.diag(cov))
     a, b = pars[0], pars[1]
-    ax.plot(sorted_sy, power_law(sorted_sy, a, b), label=f'$y = {a:.4f}x^{{{b:.4f}}}$', color='gray', alpha=.5)
+    standard_deviation_a, standard_deviation_b = standard_deviation[0], standard_deviation[1]
+    ax.plot(
+        sorted_sy,
+        power_law(sorted_sy, a, b),
+        label=f'$Depth = a \cdot (Sy)^b$\n'
+              f'$\quad a = {a:.4f}\ cm, \sigma_a = {standard_deviation_a:.4f}\ cm$\n'
+              f'$\quad b = {b:.4f}\qquad, \sigma_b = {standard_deviation_b:.4f}$',
+        color='gray', alpha=.5
+    )
 
     if power_law_x_axis:
         # Transforming Sy axis show an linear expression in plot
