@@ -7,8 +7,9 @@ import numpy
 import numpy as np
 import pandas
 from scipy.optimize import curve_fit
+from matplotlib.ticker import FixedLocator
 
-from .util import power_law
+from .util import power_law, inverse_power_law
 
 TWIN_COLOR = 'royalblue'
 
@@ -74,7 +75,11 @@ def show_depth(sy: pandas.DataFrame,
                height_of_line: Optional[float] = None,
                select: bool = False,
                show_plot: bool = True,
-               show_indexes: bool = False) -> Optional[Union[Set[int], plt.Figure]]:
+               power_law_x_axis: bool = False,
+               show_legend: bool = False,
+               show_indexes: bool = False,
+               x_limits: Optional[Tuple[float, float]] = None,
+               y_limits: Optional[Tuple[float, float]] = None) -> Optional[Union[Set[int], plt.Figure]]:
     """Plot the depth in function of Sy.
 
     Examples
@@ -102,8 +107,16 @@ def show_depth(sy: pandas.DataFrame,
         are returned.
     show_plot
         If True, "plt.show()" is called, if False, the figure is return.
+    power_law_x_axis
+        If True, the Sy axis takes a power low graduation. If False, linear graduation.
+    show_legend
+        If True, show legend.
     show_indexes
         If true, a label with the index will point to its corresponding data point.
+    x_limits
+        Tuple of the limits for the x axis.
+    y_limits
+        Tuple of the limits for the y axis.
 
     Returns
     -------
@@ -147,16 +160,35 @@ def show_depth(sy: pandas.DataFrame,
         ax.plot(sorted_sy, [height_of_line for _ in sorted_sy], '--', color='gray', alpha=.5)
 
     # Curve fit
-    pars, cov = curve_fit(f=power_law, xdata=sy['sy'].values, ydata=sy['min_wtd'])
-    ax.plot(sorted_sy, power_law(sorted_sy, pars[0], pars[1]), color='gray', alpha=.5)
+    pars, cov = curve_fit(f=power_law, xdata=sy['sy'], ydata=sy['min_wtd'])
+    a, b = pars[0], pars[1]
+    ax.plot(sorted_sy, power_law(sorted_sy, a, b), label=f'$y = {a:.4f}x^{{{b:.4f}}}$', color='gray', alpha=.5)
 
-    ax.set_ylim((-100, 0))
-    ax.set_xlim((0, 1))
+    if power_law_x_axis:
+        # Transforming Sy axis show an linear expression in plot
+        ax.set_xscale('function', functions=(lambda x: power_law(x, a, b), lambda x: inverse_power_law(x, a, b)))
+        ax.xaxis.set_major_locator(FixedLocator(numpy.arange(0, 2.1, 0.5)))
+
+        ax.set_ylim((-100, 0))
+        ax.set_xlim((sorted_sy.min()-0.001, sorted_sy.max()+0.001))
+
+    else:  # If note, plot with the default limits
+        ax.set_ylim((-100, 0))
+        ax.set_xlim((0, 1))
+
+    # Overwriting default limits if specified
+    if x_limits is not None:
+        ax.set_xlim(x_limits)
+    if y_limits is not None:
+        ax.set_ylim(y_limits)
 
     ax.xaxis.set_ticks_position('top')  # Putting x-axis on top
     ax.xaxis.set_label_position('top')
     ax.set_xlabel('Sy')
     ax.set_ylabel('Depth [cm]')
+
+    if show_legend:
+        plt.legend()
 
     plt.tight_layout()
 
