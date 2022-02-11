@@ -320,8 +320,8 @@ def show_water_level(
     Optional[matplotlib.figure.Figure]
         If "show_plot" is True, returns the plt.Figure. If False, returns None.
     """
-    beginning = sy['date_beginning'].iloc[event_index] - time_before
-    ending = sy['date_ending'].iloc[event_index] + time_after
+    beginning = sy['date_beginning'].loc[event_index] - time_before
+    ending = sy['date_ending'].loc[event_index] + time_after
 
     sub_time_series = time_series.loc[beginning:ending]
 
@@ -348,13 +348,13 @@ def show_water_level(
     ax_precipitation.tick_params(axis='y', colors=TWIN_COLOR)
 
     ax.scatter(
-        x=sy['idx_max'].iloc[[event_index]],
-        y=sy['max_wtd'].iloc[[event_index]],
+        x=sy['idx_max'].loc[[event_index]],
+        y=sy['max_wtd'].loc[[event_index]],
         s=100
     )
     ax.scatter(
-        x=sy['idx_min'].iloc[[event_index]],
-        y=sy['min_wtd'].iloc[[event_index]],
+        x=sy['idx_min'].loc[[event_index]],
+        y=sy['min_wtd'].loc[[event_index]],
         s=100
     )
     
