@@ -74,6 +74,7 @@ def show_selector(sy: pandas.DataFrame, figsize: Optional[Tuple[int, int]] = Non
 def show_depth(sy: pandas.DataFrame,
                height_of_line: Optional[float] = None,
                select: bool = False,
+               use_min_depth: bool = True,
                show_plot: bool = True,
                power_law_x_axis: bool = False,
                show_legend: bool = False,
@@ -105,6 +106,9 @@ def show_depth(sy: pandas.DataFrame,
         If True, the data points can be selected on the plot.
         When the plot is closed, the index of the selected data points
         are returned.
+    use_min_depth
+        If True, the data points dans regression use the min_wtd as depth value.
+        If Fales, the mean depth (Depth column of Sy DataFrame) is used.
     show_plot
         If True, "plt.show()" is called, if False, the figure is return.
     power_law_x_axis
@@ -141,8 +145,11 @@ def show_depth(sy: pandas.DataFrame,
         zorder=-1  # Visualy set the plot behind others
     )
 
+    # Use mean depth or mininal depth data points
+    depth_values_label = 'min_wtd' if use_min_depth else 'depth'
+
     # For the scatter plot
-    scatter_plot = ax.scatter(x=sy['sy'], y=sy['min_wtd'],
+    scatter_plot = ax.scatter(x=sy['sy'], y=sy[depth_values_label],
                               c=precepitation_sum, s=precepitation_sum,
                               vmin=min(precepitation_sum), vmax=max(precepitation_sum),
                               picker=select)
@@ -150,8 +157,8 @@ def show_depth(sy: pandas.DataFrame,
 
     # Annotation of the data points
     if show_indexes:
-        for index, row in sy[['sy', 'min_wtd']].iterrows():
-            ax.annotate(index, (row['sy'] + 0.01, row['min_wtd'] - 2))
+        for index, row in sy[['sy', depth_values_label]].iterrows():
+            ax.annotate(index, (row['sy'] + 0.01, row[depth_values_label] - 2))
 
     # Plotting the "asymptote" line
     sorted_sy = np.sort(sy['sy'])
@@ -160,7 +167,7 @@ def show_depth(sy: pandas.DataFrame,
         ax.plot(sorted_sy, [height_of_line for _ in sorted_sy], '--', color='gray', alpha=.5)
 
     # Curve fit
-    pars, cov = curve_fit(f=power_law, xdata=sy['sy'], ydata=sy['min_wtd'])
+    pars, cov = curve_fit(f=power_law, xdata=sy['sy'], ydata=sy[depth_values_label])
     standard_deviation = numpy.sqrt(numpy.diag(cov))
     a, b = pars[0], pars[1]
     standard_deviation_a, standard_deviation_b = standard_deviation[0], standard_deviation[1]
