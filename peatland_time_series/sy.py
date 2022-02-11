@@ -32,7 +32,7 @@ def calculate_sy(
     max_hour : int
         Parameter that limits the search for the maximum in the water level after a precipitation.
     threshold : float
-        Precision threshold.
+        Precipitation threshold.
     resample : str
         Resample rule for the aggregation step. See pandas.DataFrame.resample doc for more details.
 
