@@ -18,7 +18,9 @@ def filter_sy(
         date_ending_min: Optional[pandas.Timestamp] = None,
         date_ending_max: Optional[pandas.Timestamp] = None,
         intesities_min: Optional[float] = None,
-        intesities_max: Optional[float] = None) -> pandas.DataFrame:
+        intesities_max: Optional[float] = None,
+        durations_min: Optional[float] = None,
+        durations_max: Optional[float] = None) -> pandas.DataFrame:
     """Filter the Specific Yield (Sy).
 
     Examples
@@ -50,6 +52,8 @@ def filter_sy(
     date_ending_max
     intesities_min
     intesities_max
+    durations_min
+    durations_max
 
     Returns
     -------
@@ -71,7 +75,9 @@ def filter_sy(
         date_ending_min=date_ending_min,
         date_ending_max=date_ending_max,
         intesities_min=intesities_min,
-        intesities_max=intesities_max
+        intesities_max=intesities_max,
+        durations_min=durations_min,
+        durations_max=durations_max
     )
 
 
