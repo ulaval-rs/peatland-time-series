@@ -91,3 +91,56 @@ selected_indexes = show_depth(sy, select=True)
 We kindly ask users who produce scientific works to cite the following paper when using this library or algorithms :
 Quantification of peatland water storage capacity using the water table fluctuation method (https://doi.org/10.1002/hyp.11116)
 
+## Contributors
+Follow these steps to contribute to the project
+
+
+First, clone the repo
+(you may need to fork the project before if you are not a collaborator in the Github project)
+```shell
+git clone https://github.com/ulaval-rs/peatland-time-series
+```
+
+Enter the project directory
+```shell
+cd peatland-dashboard
+```
+Make a new branch where you will make the changes
+```shell
+git checkout -b your-branch-name
+```
+
+Now you can make your changes.
+Once it's done, you can add your changes and commit them.
+```shell
+git add .
+git commit -m "your message"
+```
+And push the changes.
+```shell
+git push origin your-branch-name
+```
+Finally, through the pull requests interface (`https://github.com/ulaval-rs/peatland-time-series/pulls`),
+you can make a new pull request from your branch to the main branch.
+
+## Publish on PyPi
+(Only for project admins)
+
+Follow these steps to publish on PyPi.
+You will need to have [poetry](https://python-poetry.org/) installed.
+
+On the already cloned project, be sure to be on the up-to-date main branch.
+```shell
+git checkout main
+git pull
+```
+Update the project version in `pyproject.toml`.
+
+Build the project
+```shell
+poetry build
+```
+And publish it
+```shell
+poetry publish
+```
